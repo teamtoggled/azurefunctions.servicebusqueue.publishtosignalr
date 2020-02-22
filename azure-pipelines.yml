@@ -12,7 +12,7 @@ variables:
   azureSubscription: '4dd2121a-dfe2-43bd-8671-009c6539a892'
 
   # Function app name
-  functionAppName: '$(FunctionAppName)'
+  functionAppName: '$(AzureFunctionAppName)'
 
   # Agent VM image name
   vmImageName: 'vs2017-win2016'
