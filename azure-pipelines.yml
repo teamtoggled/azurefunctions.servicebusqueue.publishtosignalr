@@ -7,17 +7,9 @@ trigger:
 - master
 
 variables:
-  # Azure Resource Manager connection created during pipeline creation
-  # This GUID only references a Resource Manager ID within my Azure DevOps pipeline. It is not my Azure Subscription ID and so I think safe to be in a public repo.
-  azureSubscription: '4dd2121a-dfe2-43bd-8671-009c6539a892'
-
-  # Function app name
+  azureSubscription: 'My Azure Subscription'
   functionAppName: '$(AzureFunctionAppName)'
-
-  # Agent VM image name
   vmImageName: 'vs2017-win2016'
-
-  # Working Directory
   workingDirectory: '$(System.DefaultWorkingDirectory)/'
 
 stages:
