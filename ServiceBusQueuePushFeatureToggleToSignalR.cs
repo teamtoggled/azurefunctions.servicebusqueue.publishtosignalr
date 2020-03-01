@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
@@ -32,7 +33,13 @@ namespace azurefunctions.servicebusqueue.publishtosignalr
             var broadcastJson = JsonConvert.SerializeObject(broadcastObject);
             log.LogInformation("Broadcasting event: " + broadcastJson);
 
-            await signalRServerHandler.Broadcast(broadcastJson);
+            try {
+                await signalRServerHandler.Broadcast(broadcastJson);
+                log.LogInformation("Event broadcasst successfully");
+            } 
+            catch(Exception e) {
+                log.LogError("Error broadcasting event", e);
+            }            
         }
     }
 }
