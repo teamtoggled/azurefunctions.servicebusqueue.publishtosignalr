@@ -1,7 +1,9 @@
-using System;
 using System.Threading.Tasks;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace azurefunctions.servicebusqueue.publishtosignalr
 {
@@ -11,16 +13,26 @@ namespace azurefunctions.servicebusqueue.publishtosignalr
         public static async Task Run([ServiceBusTrigger("%ServiceBusQueueName%", Connection = "ServiceBusConnectionString")]string myQueueItem, ILogger log)
         {
             log.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
+            var featureToggleChangedEvent = JsonConvert.DeserializeObject<FeatureToggleChangedEvent>(myQueueItem);
 
-            var signalRConnectionString = Environment.GetEnvironmentVariable("SignalRConnectionString");
-            var signalRHubName = Environment.GetEnvironmentVariable("SignalRHubName");
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
 
-            log.LogInformation($"Going to push message now, to hub {signalRHubName}");
+            var keyVaultSecret = await keyVaultClient.GetSecretAsync(featureToggleChangedEvent.SignalRConnectionStringVaultUrl);
+            var signalRConnectionString = keyVaultSecret.Value;
 
-            var signalRServerHandler = new SignalRServerHandler(signalRConnectionString, signalRHubName);            
-            await signalRServerHandler.Broadcast("This is a message from Azure Functions!");
+            var signalRHubName = featureToggleChangedEvent.ConfigurationId.ToString().ToLower();
+            var signalRServerHandler = new SignalRServerHandler(signalRConnectionString, signalRHubName); 
 
-            log.LogInformation("Pushed the message.");
+            var broadcastObject = new{
+                featureToggleName = featureToggleChangedEvent.FeatureName,
+                newValue = featureToggleChangedEvent.NewValue
+            };
+
+            var broadcastJson = JsonConvert.SerializeObject(broadcastObject);
+            log.LogInformation("Broadcasting event: " + broadcastJson);
+
+            await signalRServerHandler.Broadcast(broadcastJson);
         }
     }
 }
