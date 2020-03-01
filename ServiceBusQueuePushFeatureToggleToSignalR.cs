@@ -38,7 +38,7 @@ namespace azurefunctions.servicebusqueue.publishtosignalr
                 log.LogInformation("Event broadcasst successfully");
             } 
             catch(Exception e) {
-                log.LogError("Error broadcasting event", e);
+                log.LogError($"Error broadcasting event: {e.ToString()}", e);
             }            
         }
     }
