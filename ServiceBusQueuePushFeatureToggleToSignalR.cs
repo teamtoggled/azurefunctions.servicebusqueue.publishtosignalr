@@ -31,7 +31,7 @@ namespace azurefunctions.servicebusqueue.publishtosignalr
             };
 
             var broadcastJson = JsonConvert.SerializeObject(broadcastObject);
-            log.LogInformation("Broadcasting event: " + broadcastJson);
+            log.LogInformation($"Broadcasting event: {broadcastJson} to hub {signalRHubName} at {signalRConnectionString}");
 
             try {
                 await signalRServerHandler.Broadcast(broadcastJson);
