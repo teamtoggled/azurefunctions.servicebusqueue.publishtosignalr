@@ -24,7 +24,7 @@ namespace azurefunctions.servicebusqueue.publishtosignalr
 
             var signalRHubName = featureToggleChangedEvent.ConfigurationId.ToString().ToLower();
             signalRHubName = signalRHubName.Substring(signalRHubName.Length - 8);
-            
+
             var signalRServerHandler = new SignalRServerHandler(signalRConnectionString, signalRHubName); 
 
             var broadcastObject = new{
@@ -33,7 +33,7 @@ namespace azurefunctions.servicebusqueue.publishtosignalr
             };
 
             var broadcastJson = JsonConvert.SerializeObject(broadcastObject);
-            log.LogInformation($"Broadcasting event: {broadcastJson} to hub {signalRHubName} at {signalRConnectionString}");
+            log.LogInformation($"Broadcasting event: {broadcastJson} to hub: {signalRHubName}");
 
             try {
                 await signalRServerHandler.Broadcast(broadcastJson);
