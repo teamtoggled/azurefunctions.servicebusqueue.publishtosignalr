@@ -23,6 +23,8 @@ namespace azurefunctions.servicebusqueue.publishtosignalr
             var signalRConnectionString = keyVaultSecret.Value;
 
             var signalRHubName = featureToggleChangedEvent.ConfigurationId.ToString().ToLower();
+            signalRHubName = signalRHubName.Substring(signalRHubName.Length - 8);
+            
             var signalRServerHandler = new SignalRServerHandler(signalRConnectionString, signalRHubName); 
 
             var broadcastObject = new{
